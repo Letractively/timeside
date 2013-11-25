@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import doctest
 import os, sys
 import time
 from tools import *
@@ -73,6 +74,13 @@ class _TextTestResult(unittest.TestResult):
         elif self.dots:
             self.stream.write('F')
 
+    def addSkip(self, test, reason):
+        unittest.TestResult.addSkip(self, test, reason)
+        if self.showAll:
+            self.stream.writeln("SKIP : " + reason)
+        elif self.dots:
+            self.stream.write('S')
+
     def printErrors(self):
         if self.dots or self.showAll:
             self.stream.writeln()
@@ -143,3 +151,14 @@ class TestRunner:
         return result
 
 
+def runTestModule(*modules):
+
+    suite = unittest.TestSuite()
+    finder = doctest.DocTestFinder(exclude_empty=False)  # finder for doctest
+
+    for module in modules:
+        # Doctest
+        suite.addTest(doctest.DocTestSuite(module, test_finder=finder))
+        # unittest
+        suite.addTest(unittest.loader.TestLoader().loadTestsFromModule(module))
+    TestRunner().run(suite)

@@ -26,8 +26,7 @@ from timeside.grapher.waveform_simple import Waveform
 
 
 class WaveformTransparent(Waveform):
-    """ Builds a PIL image representing a waveform of the audio stream.
-    Adds pixels iteratively thanks to the adapter providing fixed size frame buffers.
+    """ Builds a PIL image representing a transparent waveform of the audio stream.
     """
 
     implements(IGrapher)
@@ -64,12 +63,3 @@ class WaveformTransparent(Waveform):
                 self.draw_peaks_inverted(self.pixel_cursor, peaks(samples), self.line_color)
                 self.pixel_cursor += 1
         return frames, eod
-
-    @interfacedoc
-    def render(self, output):
-        if output:
-            a = 1
-            for x in range(self.image_width):
-                self.pixel[x, self.image_height/2] = tuple(map(lambda p: p+a, self.pixel[x, self.image_height/2]))
-            self.image.save(output)
-        return self.image

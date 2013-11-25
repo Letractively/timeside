@@ -25,8 +25,7 @@ from timeside.grapher.core import *
 
 
 class Waveform(Grapher):
-    """ Builds a PIL image representing a waveform of the audio stream.
-    Adds pixels iteratively thanks to the adapter providing fixed size frame buffers.
+    """ Builds a PIL image representing a simple waveform of the audio stream.
     """
 
     implements(IGrapher)
@@ -39,7 +38,7 @@ class Waveform(Grapher):
     @staticmethod
     @interfacedoc
     def id():
-        return "waveform"
+        return "waveform_simple"
 
     @staticmethod
     @interfacedoc
@@ -65,10 +64,8 @@ class Waveform(Grapher):
         return frames, eod
 
     @interfacedoc
-    def render(self, output):
-        if output:
-            a = 1
-            for x in range(self.image_width):
-                self.pixel[x, self.image_height/2] = tuple(map(lambda p: p+a, self.pixel[x, self.image_height/2]))
-            self.image.save(output)
-        return self.image
+    def post_process(self, output=None):
+        a = 1
+        for x in range(self.image_width):
+            self.pixel[x, self.image_height/2] = tuple(map(lambda p: p+a, self.pixel[x, self.image_height/2]))
+

@@ -29,39 +29,72 @@ Here is a schematic diagram of the TimeSide engine architecture:
 .. image:: https://raw.github.com/yomguy/TimeSide/master/doc/slides/img/timeside_schema.png
 
 
-Available plugins
-=================
+Processors
+==========
 
-* Decoder:
-     - Takes ALL known media formats thanks to GStreamer
+IEncoder
+---------
 
-* Analyzers:
-     - Levels : max level, mean level, DC
-     - Yaafe : all data flows
-     - Aubio : BPM, beats, pitch, various spectral descriptors
-     - VAMP : all default plugins from simple host
-     - IRIT : 4Hz modulation and entropy speech detectors
+  * VorbisEncoder [gst_vorbis_enc]
+  * WavEncoder [gst_wav_enc]
+  * Mp3Encoder [gst_mp3_enc]
+  * FlacEncoder [gst_flac_enc]
+  * AacEncoder [gst_aac_enc]
+  * WebMEncoder [gst_webm_enc]
 
-* Graphers:
-     - Waveform
-     - Contour
-     - Spectrogram
+IDecoder
+---------
 
-* Encoders:
-     - WAV
-     - FLAC
-     - WebM
-     - OGG Vorbis
-     - MP3
+  * FileDecoder [gst_dec]
 
-* Serializers:
-     - YAML
-     - JSON
-     - XML
-     - HDF5
+IGrapher
+---------
+
+  * Waveform [waveform_simple]
+  * WaveformCentroid [waveform_centroid]
+  * WaveformTransparent [waveform_transparent]
+  * WaveformContourBlack [waveform_contour_black]
+  * WaveformContourWhite [waveform_contour_white]
+  * SpectrogramLog [spectrogram_log]
+  * SpectrogramLinear [spectrogram_linear]
+
+IAnalyzer
+---------
+
+  * IValueAnalyzer
+    - Level [level]
+    - MeanDCShift [mean_dc_shift]
+  * AubioTemporal [aubio_temporal]
+  * AubioPitch [aubio_pitch]
+  * AubioMfcc [aubio_mfcc]
+  * AubioMelEnergy [aubio_melenergy]
+  * AubioSpecdesc [aubio_specdesc]
+  * Yaafe [yaafe]
+  * Spectrogram [spectrogram_analyzer]
+  * Waveform [waveform_analyzer]
+  * VampSimpleHost [vamp_simple_host]
+  * IRITSpeechEntropy [irit_speech_entropy]
+  * IRITSpeech4Hz [irit_speech_4hz]
+  * OnsetDetectionFunction [odf]
 
 News
 =====
+
+0.5.1
+
+ * Add *parent* procesor list to Processor
+ * Simplify and optimize the grapher system
+ * Add Grapher abstract generic class
+ * Add a UUID property to Processor
+ * Add a SpectrogramLinear grapher
+ * Add WaveformTransparent grapher
+ * Fix some assignment issues regarding immutable type in for Analyzer Result
+ * Simplify analyzer results implementation by introducing a Factory and multiple classes and subclasses to handle the 8 different kinds of results
+ * Add doctests and improve the unit tests
+ * Add a OnsetDetectionFunction analyzer
+ * Update documentation
+ * Various cleanups
+ * Various bugfixes
 
 0.5.0
 

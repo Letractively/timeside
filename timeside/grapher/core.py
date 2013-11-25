@@ -30,6 +30,7 @@ except ImportError:
     import ImageFilter, ImageChops, Image, ImageDraw, ImageColor, ImageEnhance
 
 from timeside.core import *
+from timeside.api import IGrapher
 from timeside.grapher.color_schemes import default_color_schemes
 from utils import *
 
@@ -37,7 +38,7 @@ from utils import *
 class Spectrum(object):
     """ FFT based frequency analysis of audio frames."""
 
-    def __init__(self, fft_size, samplerate, blocksize, totalframes, lower, higher, window_function=numpy.hanning):
+    def __init__(self, fft_size, samplerate, blocksize, totalframes, lower, higher, window_function=None):
         self.fft_size = fft_size
         self.window = window_function(self.fft_size)
         self.window_function = window_function
@@ -52,6 +53,13 @@ class Spectrum(object):
         self.samplerate = samplerate
         self.window_function = window_function
         self.window = self.window_function(self.blocksize)
+        # Hanning window by default
+        if self.window_function:
+            self.window = self.window_function(self.blocksize)
+        else:
+            self.window_function = numpy.hanning
+            self.window = self.window_function(self.blocksize)
+
 
     def process(self, frames, eod, spec_range=120.0):
         """ Returns a tuple containing the spectral centroid and the spectrum (dB scales) of the input audio frames.
@@ -105,6 +113,9 @@ class Grapher(Processor):
     pixel_cursor = 0
     lower_freq = 20
 
+    implements(IGrapher)
+    abstract()
+
     def __init__(self, width=1024, height=256, bg_color=None, color_scheme='default'):
         super(Grapher, self).__init__()
         self.bg_color = bg_color
@@ -143,6 +154,13 @@ class Grapher(Processor):
                                  self.lower_freq, self.higher_freq, numpy.hanning)
         self.pixel = self.image.load()
         self.draw = ImageDraw.Draw(self.image)
+
+    @interfacedoc
+    def render(self, output=None):
+        if output:
+            self.image.save(output)
+            return
+        return self.image
 
     def watermark(self, text, font=None, color=(255, 255, 255), opacity=.6, margin=(5,5)):
         self.image = im_watermark(text, text, color=color, opacity=opacity, margin=margin)
@@ -262,6 +280,7 @@ class Grapher(Processor):
                     else:
                         self.draw.point((x, y+height), line_color)
                 self.previous_x, self.previous_y = x, y
+
 
 
 if __name__ == "__main__":
